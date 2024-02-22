@@ -8,11 +8,11 @@
 
 Var Connection;
 
-#Region Public
-
 ////////////////////////////////////////////////////////////////////////
 // Public methods
 ////////////////////////////////////////////////////////////////////////
+
+#Region Public
 
 Procedure Connect(DatabaseName = "") Export
 	If NOT ValueIsFilled(DatabaseName) Then
@@ -36,6 +36,27 @@ Procedure Disconnect() Export
 	Endif;
 EndProcedure
 
+Function MatchExist(ID) Export
+	Parameters = New Structure("MatchID", ID);
+	Result = ExecuteCommand(QueryText.FindMatchID(), Parameters);
+
+	Return Result > 0;
+EndFunction
+
+Function ExecuteCommand(Text, Parameters = Undefined) Export
+	Query = NewQuery(Text);
+	SetQueryParameters(Query, Parameters);
+
+	Return Query.ExecuteCommand();
+EndFunction
+
+Function ExecuteQuery(Text, Parameters = Undefined) Export
+	Query = NewQuery(Text);
+	SetQueryParameters(Query, Parameters);
+
+	Return Query.Execute().Unload();
+EndFunction
+
 #EndRegion
 
 ////////////////////////////////////////////////////////////////////////
@@ -50,7 +71,7 @@ Procedure EstablishConnection(DatabaseName)
 	File = New File(DatabaseName);
 	InitializationNeeded = Not File.Exist();
 
-	Connection = New Соединение();
+	Connection = New Connection();
 	Connection.DBType = Connection.DBTypes.sqlite;
 	Connection.DbName = DatabaseName;
 	Connection.Open();
@@ -77,13 +98,13 @@ EndProcedure
 Procedure InitializeDatabase()
 	CheckConnection();
 
-	Query = NewQuery(QueryTextCreateTableMatchDetails());
+	Query = NewQuery(QueryText.CreateTableMatchDetails());
 	Query.ExecuteCommand();
 
-	Query = NewQuery(QueryTextCreateTableUserDetails());
+	Query = NewQuery(QueryText.CreateTableUserDetails());
 	Query.ExecuteCommand();
 
-	Query = NewQuery(QueryTextCreateTableMechs());
+	Query = NewQuery(QueryText.CreateTableMechs());
 	Query.ExecuteCommand();
 EndProcedure
 
@@ -104,70 +125,15 @@ Function NewQuery(Text = "")
 	Return NewQuery;
 EndFunction
 
-Function QueryTextCreateTableMatchDetails()
-	Text = "CREATE TABLE MatchDetails (
-	|	MatchID INTEGER PRIMARY KEY,
-	|	Division TEXT,
-	|	Week INTEGER,
-	|	DropNumber INTEGER,
-	|	Team1Name TEXT,
-	|	Team2Name TEXT,
-	|	Map TEXT,
-	|	ViewMode TEXT,
-	|	TimeOfDay TEXT,
-	|	GameMode TEXT,
-	|	Region TEXT,
-	|	MatchTimeMinutes TEXT,
-	|	UseStockLoadout BOOLEAN,
-	|	NoMechQuirks BOOLEAN,
-	|	NoMechEfficiencies BOOLEAN,
-	|	WinningTeam TEXT,
-	|	Team1Score INTEGER,
-	|	Team2Score INTEGER,
-	|	MatchDuration TEXT,
-	|	CompleteTime TEXT
-	|)";
+Procedure SetQueryParameters(Query, Parameters)
+	If Parameters = Undefined Then
+		Return;
+	EndIf;
 
-	Return Text;
-EndFunction
-
-Function QueryTextCreateTableUserDetails()
-	Text = "CREATE TABLE UserDetails (
-	|	ID INTEGER PRIMARY KEY,
-	|	MatchID INTEGER,
-	|	Username TEXT,
-	|	IsSpectator BOOLEAN,
-	|	Team TEXT,
-	|	Lance TEXT,
-	|	MechItemID INTEGER,
-	|	MechName TEXT,
-	|	SkillTier INTEGER,
-	|	HealthPercentage INTEGER,
-	|	Kills INTEGER,
-	|	KillsMostDamage INTEGER,
-	|	Assists INTEGER,
-	|	ComponentsDestroyed INTEGER,
-	|	MatchScore INTEGER,
-	|	Damage INTEGER,
-	|	TeamDamage INTEGER,
-	|	UnitTag TEXT
-	|)";
-
-	Return Text;
-EndFunction
-
-Function QueryTextCreateTableMechs()
-	Text = "CREATE TABLE Mechs (
-	|	ID INTEGER PRIMARY KEY,
-	|	ItemID INTEGER,
-	|	Name TEXT,
-	|	Chassis TEXT,
-	|	Tonnage INTEGER,
-	|	Class TEXT
-	|)";
-
-	Return Text;
-EndFunction
+	For Each Parameter In Parameters Do
+		Query.SetParameter(Parameter.Key, Parameter.Value);
+	EndDo;
+EndProcedure
 
 #EndRegion
 
