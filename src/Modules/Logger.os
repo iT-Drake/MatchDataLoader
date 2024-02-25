@@ -4,8 +4,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#Use logos
-
 Var CurrentLevel;
 Var Level Export;
 
@@ -67,7 +65,7 @@ Function LevelCaption(LogLevel)
 	Return Result.Get(LogLevel);
 EndFunction
 
-Function FormatMessage(Message, Parameter1 = Undefined, Parameter2 = Undefined, Parameter3 = Undefined,
+Function FormatMessage(Message, Level, Parameter1 = Undefined, Parameter2 = Undefined, Parameter3 = Undefined,
 	Parameter4 = Undefined, Parameter5 = Undefined, Parameter6 = Undefined)
 	
 	FormattedMessage = ReplaceParameter(Message, Parameter6, 6);
@@ -77,7 +75,7 @@ Function FormatMessage(Message, Parameter1 = Undefined, Parameter2 = Undefined, 
 	FormattedMessage = ReplaceParameter(FormattedMessage, Parameter2, 2);
 	FormattedMessage = ReplaceParameter(FormattedMessage, Parameter1, 1);
 
-	Return StrTemplate("%1 - %2", LevelCaption(CurrentLevel), FormattedMessage);
+	Return StrTemplate("%1 - %2", LevelCaption(Level), FormattedMessage);
 EndFunction
 
 Function ReplaceParameter(Message, Value, ParameterNumber = 1)
@@ -94,7 +92,7 @@ Procedure ShowMessage(Val Message, Level, Parameter1, Parameter2, Parameter3, 	P
 		Return;
 	EndIf;
 
-	Message = FormatMessage(Message, Parameter1, Parameter2, Parameter3, Parameter4, Parameter5, Parameter6);
+	Message = FormatMessage(Message, Level, Parameter1, Parameter2, Parameter3, Parameter4, Parameter5, Parameter6);
 	Message(Message);
 EndProcedure
 

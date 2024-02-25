@@ -38,9 +38,9 @@ EndProcedure
 
 Function MatchExist(ID) Export
 	Parameters = New Structure("MatchID", ID);
-	Result = ExecuteCommand(QueryText.FindMatchID(), Parameters);
+	Result = ExecuteQuery(QueryText.FindMatchID(), Parameters);
 
-	Return Result > 0;
+	Return Result.Count() > 0;
 EndFunction
 
 Function ExecuteCommand(Text, Parameters = Undefined) Export
@@ -55,6 +55,16 @@ Function ExecuteQuery(Text, Parameters = Undefined) Export
 	SetQueryParameters(Query, Parameters);
 
 	Return Query.Execute().Unload();
+EndFunction
+
+Function ExecuteBatchQuery(BatchQuery) Export
+	Result = New Structure;
+	For Each Item In BatchQuery Do
+		ValueTable = ExecuteQuery(Item.Value);
+		Result.Insert(Item.Key, ValueTable);
+	EndDo;
+
+	Return Result;
 EndFunction
 
 #EndRegion
@@ -105,6 +115,9 @@ Procedure InitializeDatabase()
 	Query.ExecuteCommand();
 
 	Query = NewQuery(QueryText.CreateTableMechs());
+	Query.ExecuteCommand();
+
+	Query = NewQuery(QueryText.CreateTableTeamRosters());
 	Query.ExecuteCommand();
 EndProcedure
 

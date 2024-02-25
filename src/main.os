@@ -13,42 +13,73 @@ Procedure Initialize()
 	Database.Connect("data\MatchResults.db");
 EndProcedure
 
-Procedure PullData()
-	
+Procedure LoadTeamRosters()
+	Load.TeamRosters("data\TeamRosters.csv");
+EndProcedure
+
+Procedure LoadMechData()
+	Load.MechData("data\MechData.csv");
+EndProcedure
+
+Procedure LoadMatchData()
+	ApiKey = "";
+	Load.MatchData(ApiKey, "data\Matches.csv");
 EndProcedure
 
 Procedure GenerateReports()
-	
-EndProcedure
+	Queries = New Structure;
+	Queries.Insert("PilotWithMostDamageDealt", QueryText.PilotWithMostDamageDealt());
+	Queries.Insert("TeamWithMostDamageDealt", QueryText.TeamWithMostDamageDealt());
 
-Procedure Test()
-	ReadData.FromCSV("data\TeamRosters.csv");
+	Result = Database.ExecuteBatchQuery(Queries);
+	For Each Item In Result Do
+		FileName = StrTemplate("reports\%1.csv", Item.Key);
+		WriteData.ToCSV(FileName, Item.Value);
+	EndDo;
 EndProcedure
 
 Procedure Finalize()
-	Logger.Information("All operations completed");
 	Database.Disconnect();
+	Logger.Information("All operations completed");
 EndProcedure
 
 ////////////////////////////////////////////////////////////////////////
 //
 // Script execution divided in a few steps:
-//	- Initialization - set up logging tool and establish connection to
-//		the database (database file name could be customized);
-//	- Data pulling - read information from about match ID's and download
-//		data through MWO API;
+//	- Initialization - sets up logging tool and establishes connection
+//		to the database (creates it if not exist);
+//	- Initial filling - loads in information about team rosters and
+//		mechs (need to run it only once unless there are updates);
+//	- Data pulling - read match ID's and download data through MWO API;
 //	- Report generation - run predefined or custom SQL-queries to
 //		generate report files;
 //	- Finalization - close connection to the database to save changes.
+//
+//	Any step between Initialization and Finalization may be skipped,
+//	just comment the method call.
+//	Folder structure and file names could be customized.
 //
 ////////////////////////////////////////////////////////////////////////
 
 Initialize();
 
-PullData();
+////////////////////////////////////////////////////////////////////////
+// Step 1
+////////////////////////////////////////////////////////////////////////
+
+LoadTeamRosters();
+LoadMechData();
+
+////////////////////////////////////////////////////////////////////////
+// Step 2
+////////////////////////////////////////////////////////////////////////
+
+LoadMatchData();
+
+////////////////////////////////////////////////////////////////////////
+// Step 3
+////////////////////////////////////////////////////////////////////////
 
 GenerateReports();
-
-Test();
 
 Finalize();
