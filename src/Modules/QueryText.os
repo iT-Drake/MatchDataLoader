@@ -137,7 +137,7 @@ Function FindMech() Export
 EndFunction
 
 Function TeamRosters() Export
-	Return "SELECT UPPER(Pilot), Team FROM TeamRosters";
+	Return "SELECT UPPER(Pilot) AS Pilot, Team FROM TeamRosters";
 EndFunction
 
 #EndRegion
