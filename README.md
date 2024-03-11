@@ -53,7 +53,7 @@ ItemID,Name,Chassis,Tonnage,Class
 3681,BL-X-KNT-2,BL-KNT,75,HEAVY
 ```
 
-Fill in matches (default file: `data/Matches.csv`). Script isn't using `Team1` and `Team2` fields, but their are useful for a manual check of the file. Drop ID's, if there are multiple in one match, should be separated with a space like this:
+Fill in matches (default file: `data/Matches.csv`). Script isn't using `Team1` and `Team2` fields, but they are useful for a manual check of the file. Drop ID's, if there are multiple in one match, should be separated with a space like this:
 ```
 Round,Division,Team1,Team2,DropIDs
 1,A,Clan Ghost Bear,Clan Jade Falcon,487519148581506 487184141131062 488120444005522 487811206358963 488382437011588
