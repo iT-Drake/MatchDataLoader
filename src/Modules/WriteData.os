@@ -96,7 +96,7 @@ EndFunction
 
 Function SetStringToSize(String, Size);
 	StringOfSpaces = StringOfSpaces(Size);
-	Return Left(String + StringOfSpaces, Size);
+	Return Left(StrTemplate("%1%2", String, StringOfSpaces), Size);
 EndFunction
 
 #EndRegion
